@@ -11,7 +11,8 @@
 #   - dist/**/*.js
 #
 src_files:
-    - lib/**/*.js
+    - jquery.js
+    - jquery.fakern.js
 
 # stylesheets
 #
@@ -25,6 +26,7 @@ src_files:
 #   - stylesheets/*.css
 #
 stylesheets:
+    - jquery.fakern.css
 
 # helpers
 #

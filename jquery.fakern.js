@@ -271,7 +271,7 @@
                 }
                 else {
                     if($.isArray( ar[i] )) {
-                        if(ret = inMultiArray(val, ar[i], strict)) {
+                        if(ret = _inMultiArray(val, ar[i], strict)) {
                             return ret;
                         }
                     }
@@ -307,10 +307,10 @@
             @returns {boolean|array} Boolean if the letter should not be kerned | The array with the letter/value combination
         */
         _shouldKern = function(l, r) {
-            var ret = inMultiArray(r, pairs[l]);
+            var ret = _inMultiArray(r, pairs[l]);
             
             console.log(ret,l,r)
-            if ( !pairs[l] || isExcluded(l, r) || ret === false )  {
+            if ( !pairs[l] || _isExcluded(l, r) || ret === false )  {
                 return false;
             }
 
@@ -338,7 +338,7 @@
                     kern;
 
                 if ( idx < len-1) {                    
-                    if (kern = shouldKern(ltr, nxt)) {
+                    if (kern = _shouldKern(ltr, nxt)) {
                         cur = '<span class="fakern" style="margin-right:'+((kern[1])/1000*fontSize)+'">'+cur+'</span>';
                     }
                 }

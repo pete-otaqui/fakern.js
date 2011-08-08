@@ -313,8 +313,7 @@
          */
         _shouldKern = function(l, r) {
             var ret = _inMultiArray(r, pairs[l]);
-            
-            console.log(ret,l,r)
+
             if ( !pairs[l] || _isExcluded(l, r) || ret === false )  {
                 return false;
             }

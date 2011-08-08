@@ -248,14 +248,14 @@
         },
 
         /*
-            Searches for a value inside a multiple array
-            @function 
-            @private
-            @param {number|string} val The needle
-            @param {array} ar The haystack
-            @param {boolean} [strict=false] Strict type comparison
-            @returns {boolean|array} Boolean if value is not present | The last array in the hierarchy that the value was present in
-        */
+         *   Searches for a value inside a multiple array
+         *   @function 
+         *   @private
+         *   @param {number|string} val The needle
+         *   @param {array} ar The haystack
+         *   @param {boolean} [strict=false] Strict type comparison
+         *   @returns {boolean|array} Boolean if value is not present | The last array in the hierarchy that the value was present in
+         */
         _inMultiArray = function(val, ar, strict) {
             if(!ar) {
                 return false;
@@ -271,7 +271,7 @@
                 }
                 else {
                     if($.isArray( ar[i] )) {
-                        if(ret = inMultiArray(val, ar[i], strict)) {
+                        if(ret = _inMultiArray(val, ar[i], strict)) {
                             return ret;
                         }
                     }
@@ -283,8 +283,13 @@
         },
 
         /*
-            Checks if a ltter should be excluded
-        */
+         *   Checks if a letter should be excluded. If next isn't available, then all letter combinations for that letter will be excluded
+         *   @function
+         *   @private
+         *   @param {char} letter The letter to check for exclusion
+         *   @param {char} [next=-1] The next letter to kern with
+         *   @returns {boolean} True is the letter is to be excluded
+         */
         _isExcluded = function(letter, next) {
             var obj = opts.exclude,
                 next = next || -1;
@@ -299,18 +304,18 @@
         },
                
         /*
-            Checks if two letters should be kerned
-            @function 
-            @private
-            @param l {string} The letter on the left, which should be kerned
-            @param r {string} The letter on the right. If present, the letter on the left will be kerned
-            @returns {boolean|array} Boolean if the letter should not be kerned | The array with the letter/value combination
-        */
+         *   Checks if two letters should be kerned
+         *   @function 
+         *   @private
+         *   @param {string} l The letter on the left, which should be kerned
+         *   @param {string} r The letter on the right. If present, the letter on the left will be kerned
+         *   @returns {boolean|array} Boolean if the letter should not be kerned | The array with the letter/value combination
+         */
         _shouldKern = function(l, r) {
-            var ret = inMultiArray(r, pairs[l]);
+            var ret = _inMultiArray(r, pairs[l]);
             
             console.log(ret,l,r)
-            if ( !pairs[l] || isExcluded(l, r) || ret === false )  {
+            if ( !pairs[l] || _isExcluded(l, r) || ret === false )  {
                 return false;
             }
 
@@ -338,7 +343,7 @@
                     kern;
 
                 if ( idx < len-1) {                    
-                    if (kern = shouldKern(ltr, nxt)) {
+                    if (kern = _shouldKern(ltr, nxt)) {
                         cur = '<span class="fakern" style="margin-right:'+((kern[1])/1000*fontSize)+'">'+cur+'</span>';
                     }
                 }

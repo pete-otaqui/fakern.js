@@ -1,25 +1,26 @@
 /*
- *   The Fakern plugin will apply kerning values on specific letter combinations.
- *   The values for the pairs were taken from a sample list from the adobe site
- *   http://partners.adobe.com/public/developer/opentype/index_kerning1.html
- *   The plugin will respect the element's font size regardless of its unit. Hence the kerning itself is unitless.
- *   The project is sponsored by Mangahigh.com
- *   
- *   @example
- *   $('body').fakern({ 
- *       include : { 
- *           '@' : [ ['a',-10], ['b',-20] ],
- *           '$' : [ ['a',-10], ['b',-20] ] 
- *       },
- *       
- *       exclude : {
- *           a : true,
- *           B : ['a','b','C'] 
- *       }
- *   });
+ *  The Fakern plugin will apply kerning values on specific letter combinations.
+ *  The values for the pairs were taken from a sample list from the Adobe site
+ *  http://partners.adobe.com/public/developer/opentype/index_kerning1.html
+ *  The plugin will factor all values by the element's font-size regardless of its unit. 
+ *  It will force pixels as kerning units, in order to avoid doctype issues.
+ *  The project is sponsored by Mangahigh.com
  *  
- *   @author <a href="http://lcampanis.com" target="_blank">Lorenzo Campanis</a>
- *   @author <a href="http://otaqui.com" target="_blank">Pete Otaqui</a>, 
+ *  @example
+ *  $('body').fakern({ 
+ *      include : { 
+ *          '@' : [ ['a',-10], ['b',-20] ],
+ *          '$' : [ ['a',-10], ['b',-20] ] 
+ *      },
+ *      
+ *      exclude : {
+ *          a : true,   // ignore ALL character
+ *          B : ['a','b','C'] // ignore only some characters
+ *      }
+ *  });
+ *  
+ *  @author <a href="http://lcampanis.com" target="_blank">Lorenzo Campanis</a>
+ *  @author <a href="http://otaqui.com" target="_blank">Pete Otaqui</a>, 
  */
 (function($) {
     
@@ -27,9 +28,15 @@
      *  @param {Object} [opts] Additional options
      *  @param {Object} [opts.include] A list of multidimentional arrays with additional letter combinations. 
      *  @param {Object} [opts.exclude] A list of multidimentional arrays with letter combinations to be excluded or set some letters to true to exclude all letter combinations
+     *  @param {Object} [opts.pairs] A hash of character pair kerning values, if not supplied the default Roman set will be used instead.
      */
     $.fn.fakern = function(opts) {
-        var pairs = {
+        opts = $.extend({
+            exclude : {},
+            include : {}
+        }, opts);      
+
+        var pairs = opts.pairs || {
             A : [['y', -92],
                  ['w', -92],
                  ['v', -74],
@@ -248,13 +255,13 @@
         },
 
         /*
-         *   Searches for a value inside a multiple array
-         *   @function 
-         *   @private
-         *   @param {number|string} val The needle
-         *   @param {array} ar The haystack
-         *   @param {boolean} [strict=false] Strict type comparison
-         *   @returns {boolean|array} Boolean if value is not present | The last array in the hierarchy that the value was present in
+         *  Searches for a value inside a multiple array
+         *  @function 
+         *  @private
+         *  @param {number|string} val The needle
+         *  @param {array} ar The haystack
+         *  @param {boolean} [strict=false] Strict type comparison
+         *  @returns {boolean|array} False if value is not present | The last array in the hierarchy that the value was present in
          */
         _inMultiArray = function(val, ar, strict) {
             if(!ar) {
@@ -283,12 +290,13 @@
         },
 
         /*
-         *   Checks if a letter should be excluded. If next isn't available, then all letter combinations for that letter will be excluded
-         *   @function
-         *   @private
-         *   @param {char} letter The letter to check for exclusion
-         *   @param {char} [next=-1] The next letter to kern with
-         *   @returns {boolean} True is the letter is to be excluded
+         *  Checks if a letter should be excluded. If next isn't available, and the letter exists in the excluded,
+         *  then all letter combinations for that letter will be excluded
+         *  @function
+         *  @private
+         *  @param {char} letter The letter to check for exclusion
+         *  @param {char} [next=-1] The next letter to kern with
+         *  @returns {boolean} True is the letter is to be excluded
          */
         _isExcluded = function(letter, next) {
             var obj = opts.exclude,
@@ -304,27 +312,22 @@
         },
                
         /*
-         *   Checks if two letters should be kerned
-         *   @function 
-         *   @private
-         *   @param {string} l The letter on the left, which should be kerned
-         *   @param {string} r The letter on the right. If present, the letter on the left will be kerned
-         *   @returns {boolean|array} Boolean if the letter should not be kerned | The array with the letter/value combination
+         *  Checks if two letters should be kerned
+         *  @function 
+         *  @private
+         *  @param {string} l The letter on the left, which should be kerned
+         *  @param {string} r The letter on the right. If present, the letter on the left will be kerned
+         *  @returns {boolean|number} False if the letter should not be kerned | The negative kern value or that letter
          */
         _shouldKern = function(l, r) {
             var ret = _inMultiArray(r, pairs[l]);
 
-            if ( !pairs[l] || _isExcluded(l, r) || ret === false )  {
+            if ( !pairs[l] || _isExcluded(l, r) || ret === false || ret === undefined )  {
                 return false;
             }
 
-            return ret;
-        };
-
-        opts = $.extend({
-            exclude : {},
-            include : {}
-        }, opts);        
+            return ret[1];
+        };  
 
         pairs = $.extend(pairs, opts.include);
 
@@ -343,7 +346,7 @@
 
                 if ( idx < len-1) {                    
                     if (kern = _shouldKern(ltr, nxt)) {
-                        cur = '<span class="fakern" style="margin-right:'+((kern[1])/1000*fontSize)+'">'+cur+'</span>';
+                        cur = '<span class="fakern" style="margin-right:'+((kern)/1000*fontSize)+'px">'+cur+'</span>';
                     }
                 }
 

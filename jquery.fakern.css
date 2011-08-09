@@ -1,13 +1,7 @@
-
+body { font-family:arial; font-size:12px; }
 p {
     margin:0;
 }
-.FAKED, .UNFAKED {
-    font-size:10em;
-}
-.UNFAKED {
-    color: #666;
-}
 .fakern {
-    margin-right:-0.15em;
+   color: #f00;
 }

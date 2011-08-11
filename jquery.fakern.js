@@ -14,7 +14,7 @@
  *      },
  *      
  *      exclude : {
- *          a : true,   // ignore ALL character
+ *          a : true,   // ignore ALL characters
  *          B : ['a','b','C'] // ignore only some characters
  *      }
  *  });
@@ -36,6 +36,10 @@
             include : {}
         }, opts);      
 
+        /*
+         *  @private
+         *  @param {Object} pairs Default kerning values 
+         */
         var pairs = opts.pairs || {
             A : [['y', -92],
                  ['w', -92],
@@ -133,7 +137,7 @@
                  ['a', -111],
                  ['O', -40],
                  ['G', -15],
-                 ['A', -135]],
+                 ['A', -115]],
 
             W : [['y', -73],
                  ['u', -50],
@@ -254,6 +258,15 @@
                  [',', -65]]
         },
 
+        html5Tags = ['<a>','<abbr>','<address>','<area>','<article>','<aside>','<audio>','<b>','<base>','<bb>','<bdo>','<blockquote>',
+                    '<body>','<br>','<button>','<canvas>','<caption>','<cite>','<code>','<col>','<colgroup>','<command>','<datagrid>',
+                    '<datalist>','<dd>','<del>','<details>','<dfn>','<div>','<dl>','<dt>','<em>','<embed>','<eventsource>','<fieldset>',
+                    '<figcaption>','<figure>','<footer>','<form>','<h1>','<h2>','<h3>','<h4>','<h5>','<h6>','<head>','<header>','<hgroup>',
+                    '<hr>','<html>','<i>','<iframe>','<img>','<input>','<ins>','<kbd>','<keygen>','<label>','<legend>','<li>','<link>','<mark>',
+                    '<map>','<menu>','<meta>','<meter>','<nav>','<noscript>','<object>','<ol>','<optgroup>','<option>','<output>','<p>',
+                    '<param>','<pre>','<progress>','<q>','<ruby>','<rp>','<rt>','<samp>','<script>','<section>','<select>','<small>','<source>',
+                    '<span>','<strong>','<style>','<sub>','<summary>','<sup>','<table>','<tbody>','<td>','<textarea>','<tfoot>','<th>','<thead>',
+                    '<time>','<title>','<tr>','<ul>','<var>','<video>','<wbr>'],
         /*
          *  Searches for a value inside a multiple array
          *  @function 
@@ -317,7 +330,7 @@
          *  @private
          *  @param {string} l The letter on the left, which should be kerned
          *  @param {string} r The letter on the right. If present, the letter on the left will be kerned
-         *  @returns {boolean|number} False if the letter should not be kerned | The negative kern value or that letter
+         *  @returns {boolean|number} False if the letter should not be kerned | The negative kern value of that letter
          */
         _shouldKern = function(l, r) {
             var ret = _inMultiArray(r, pairs[l]);
@@ -327,32 +340,161 @@
             }
 
             return ret[1];
-        };  
+        },
 
-        pairs = $.extend(pairs, opts.include);
+        /*
+         *  Checks if an element has a 'block' display type
+         *  @function
+         *  @private
+         *  @param {DOMObject} node The node to be inspected inspect
+         *  @returns {Boolean} True if the element has a block display
+         */
+        _isBlockDisplay = function(node) {
+            if(node.nodeType === 3) {
+                return false;
+            }
 
-        return this.each(function() {
-            var $ele = $(this),
-                text = $ele.text(),
+            var display,
+                gcs = "getComputedStyle" in window;
+
+            display = (gcs ? window.getComputedStyle(node, null) : node.currentStyle).display; 
+
+            return display === 'block';
+        },
+
+        /*
+         *  Look for the next character anywhere within the defined hierarchy.
+         *  @function
+         *  @private
+         *  @param {DOMObject} node The current node being kerned
+         *  @param {Boolean} skipFirst On a first call the current node needs to be skipped
+         *  @return {null|char} If available, the next consecutive character
+         */
+        _getNextInlineCharacter = function(node, skipFirst) {
+            if ( _isBlockDisplay(node) ) {
+                return null;
+            }
+
+            if ( skipFirst ) {
+                if ( node.nextSibling ) {
+                    node = node.nextSibling;
+                    skipFirst = false;
+                }
+            }
+
+            while ( node && !skipFirst) {
+                if ( _isBlockDisplay(node) ) {
+                    return null;
+                }
+
+                if ( $(node).text() && $(node).text() !== '' ) {
+                    return $(node).text()[0];
+                }
+                
+                if ( node.nextSibling ) {
+                    node = node.nextSibling;
+                }   
+                else {
+                    break;
+                }
+            }
+
+            while ( node.parentNode !== rootNode && node !== rootNode ) {
+                while ( node.parentNode.nextSibling ) {
+                    if ( _isBlockDisplay(node.parentNode.nextSibling) ) {
+                        return null;
+                    }
+
+                    ltr = _getNextInlineCharacter(node.parentNode.nextSibling);
+                    
+                    if ( ltr ) {
+                        return ltr;
+                    }
+                    
+                    node = node.parentNode.nextSibling;
+                }
+
+                node = node.parentNode;
+            }
+
+            return null;
+        },
+
+        /*
+         *  Apply kerning to a text node based on paired values
+         *  @function
+         *  @private
+         *  @param {DOMObject} node The Text node to kern
+         *  @returns {string} The new string of kerned characters, as applicable
+         */
+        _kernTextNode = function(node) {
+            var $node = $(node),
+                text = $node.text(),
                 ltrs = text.split(''),
                 strn = '',
                 len = ltrs.length,
-                fontSize = parseInt($ele.css('fontSize'), 10);
+                fontSize = parseInt($node.parent().css('fontSize'), 10); 
             
             $(ltrs).each(function(idx, ltr) {
                 var cur = ltr,
-                    nxt = ltrs[idx+1],
+                    nxt,
                     kern;
 
-                if ( idx < len-1) {                    
-                    if (kern = _shouldKern(ltr, nxt)) {
-                        cur = '<span class="fakern" style="margin-right:'+((kern)/1000*fontSize)+'px">'+cur+'</span>';
-                    }
+                if ( idx < len-1) {
+                    nxt = ltrs[idx+1]
+                } 
+                else {
+                    nxt = _getNextInlineCharacter(node, true);
+                }
+
+                kern = _shouldKern(ltr, nxt);
+                if (nxt !== null && kern) {
+                    cur = '<span class="fakern" style="margin-right:'+((kern)/1000*fontSize)+'px">'+cur+'</span>';
                 }
 
                 strn += cur;
             });
-            $ele.html(strn);
+            return strn;
+        },
+        
+        /*
+         *  Traverse the HTML DOM hierarchy in order to kern selected pairs of characters
+         *  @function
+         *  @private
+         *  @param {Array} nodes The array of nodes to traverse
+         *  @returns {String} The new kerned hierarchy
+         */
+        _traverseHTML = function(nodes) {
+            var strn = '',
+                tagAtts, tagStart, tagEnd;
+
+            for(var i=0; i<nodes.length; ++i) {
+                if(nodes[i].nodeType === 3) {
+                    strn += _kernTextNode(nodes[i]);
+                }
+                else {
+                    // extend the attributes array to support Array methods
+                    atts = $.extend([], nodes[i].attributes);
+                    atts = atts.length > 0 ? ' '+atts.join(' ') : '';
+                    start = '<' + nodes[i].tagName + atts +'>';
+                    end = '</' + nodes[i].tagName +'>';
+
+                    // kerned or not, we will preserve the existing tag with its attributes!
+                    strn += start + _traverseHTML( $(nodes[i]).contents() ) + end;
+                }                  
+            }
+
+            return strn;
+        },
+
+        rootNode;
+
+        pairs = $.extend(pairs, opts.include);
+
+        return this.each(function() {
+            rootNode = this;
+            strn = _traverseHTML( this.childNodes );
+            $(this).html(strn);
         });
     };  
     

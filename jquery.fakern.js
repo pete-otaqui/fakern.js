@@ -131,8 +131,7 @@
                 gcs = "getComputedStyle" in window;
 
             display = (gcs ? window.getComputedStyle(node, null) : node.currentStyle).display; 
-			
-			console.log("checking",node,"for block display", display)
+
             return display === 'block';
         },
 
@@ -227,7 +226,6 @@
                 } 
                 else {
                     nxt = _getNextInlineCharacter(node, true);
-                    console.log('next is:',cur,nxt);
                 }
 
                 kern = _shouldKern(ltr, nxt);

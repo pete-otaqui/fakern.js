@@ -31,16 +31,246 @@
      *  @param {Object} [opts.pairs] A hash of character pair kerning values, if not supplied the default Roman set will be used instead.
      */
     $.fn.fakern = function(opts) {
+        
         opts = $.extend({
             exclude : {},
             include : {}
-        }, opts);      
+        }, opts);
+        
+        
+        var pairs,
+
+        /*
+         *  Searches for a value inside a multiple array
+         *  @function 
+         *  @private
+         *  @param {number|string} val The needle
+         *  @param {array} ar The haystack
+         *  @param {boolean} [strict=false] Strict type comparison
+         *  @returns {boolean|array} False if value is not present | The last array in the hierarchy that the value was present in
+         */
+        _inMultiArray = function(val, ar, strict) {
+            if(!ar) {
+                return false;
+            }
+
+            var ret = [];
+            strict = strict || false;
+            
+            for(var i=0; i<ar.length; ++i) {                
+                if( (strict && ar[i] === val) ||
+                    (!strict && ar[i] == val)) {
+                    return ar;
+                }
+                else {
+                    if($.isArray( ar[i] )) {
+                        if(ret = _inMultiArray(val, ar[i], strict)) {
+                            return ret;
+                        }
+                    }
+                    else {
+                        return false;               
+                    }
+                }
+            }            
+        },
+
+        /*
+         *  Checks if a letter should be excluded. If next isn't available, and the letter exists in the excluded,
+         *  then all letter combinations for that letter will be excluded
+         *  @function
+         *  @private
+         *  @param {char} letter The letter to check for exclusion
+         *  @param {char} [next=-1] The next letter to kern with
+         *  @returns {boolean} True is the letter is to be excluded
+         */
+        _isExcluded = function(letter, next) {
+            var obj = opts.exclude,
+                next = next || -1;
+
+            if(obj.hasOwnProperty(letter)) {
+                if(obj[letter] === true || $.inArray(next, obj[letter]) !== -1) {
+                    return true;
+                }
+            }
+
+            return false;
+        },
+               
+        /*
+         *  Checks if two letters should be kerned
+         *  @function 
+         *  @private
+         *  @param {string} l The letter on the left, which should be kerned
+         *  @param {string} r The letter on the right. If present, the letter on the left will be kerned
+         *  @returns {boolean|number} False if the letter should not be kerned | The negative kern value of that letter
+         */
+        _shouldKern = function(l, r) {
+            var ret = _inMultiArray(r, pairs[l]);
+
+            if ( !pairs[l] || _isExcluded(l, r) || ret === false || ret === undefined )  {
+                return false;
+            }
+
+            return ret[1];
+        },
+
+        /*
+         *  Checks if an element has a 'block' display type
+         *  @function
+         *  @private
+         *  @param {DOMObject} node The node to be inspected inspect
+         *  @returns {Boolean} True if the element has a block display
+         */
+        _isBlockDisplay = function(node) {
+            if(node.nodeType === 3) {
+                return false;
+            }
+
+            var display,
+                gcs = "getComputedStyle" in window;
+
+            display = (gcs ? window.getComputedStyle(node, null) : node.currentStyle).display; 
+			
+			console.log("checking",node,"for block display", display)
+            return display === 'block';
+        },
+
+        /*
+         *  Look for the next character anywhere within the defined hierarchy.
+         *  @function
+         *  @private
+         *  @param {DOMObject} node The current node being kerned
+         *  @param {Boolean} skipFirst On a first call the current node needs to be skipped
+         *  @return {null|char} If available, the next consecutive character
+         */
+        _getNextInlineCharacter = function(node, skipFirst) {
+            if (node.parentNode !== rootNode && node !== rootNode && _isBlockDisplay(node) ) {
+                return null;
+            }
+
+            if ( skipFirst ) {
+                if ( node.nextSibling ) {
+                    node = node.nextSibling;
+                    skipFirst = false;
+                }
+            }
+
+            while ( node && !skipFirst) {
+                if ( _isBlockDisplay(node) ) {
+                    return null;
+                }
+
+                var text = $(node).text();
+                if ( text && text !== '' ) {
+                    return text[0];
+                }
+                
+                if ( node.nextSibling ) {
+                    node = node.nextSibling;
+                }   
+                else {
+                    break;
+                }
+            }
+
+            while ( node.parentNode !== rootNode && node !== rootNode ) {
+                while ( node.parentNode.nextSibling ) {
+                	// make sure the current node isn't a blocked display, as well as its sibbling
+                    if ( _isBlockDisplay(node.parentNode.nextSibling) || _isBlockDisplay(node.parentNode) || _isBlockDisplay(node)) {
+                        return null;
+                    }
+
+                    ltr = _getNextInlineCharacter(node.parentNode.nextSibling);
+                    
+                    if ( ltr ) {
+                        return ltr;
+                    }
+                    
+                    node = node.parentNode.nextSibling;
+                }
+
+                node = node.parentNode;
+            }
+
+            return null;
+        },
+
+        /*
+         *  Apply kerning to a text node based on paired values
+         *  @function
+         *  @private
+         *  @param {DOMObject} node The Text node to kern
+         */
+        _kernTextNode = function(node) {
+            var $node = $(node),
+                text = $node.text(),
+                ltrs = text.split(''),
+                strn = '',
+                len = ltrs.length,
+                fontSize = parseInt($node.parent().css('fontSize'), 10),
+                nodeIndex = -1;
+            
+            $(node.parentNode.childNodes).each(function(idx, nde) {
+                if ( nde == node ) {
+                    nodeIndex = idx;
+                }
+            });
+            
+            $(ltrs).each(function(idx, ltr) {
+                var cur = ltr,
+                    nxt,
+                    kern;
+
+                if ( idx < len-1) {
+                    nxt = ltrs[idx+1];
+                } 
+                else {
+                    nxt = _getNextInlineCharacter(node, true);
+                    console.log('next is:',cur,nxt);
+                }
+
+                kern = _shouldKern(ltr, nxt);
+                if (nxt !== null && kern) {
+                    cur = '<span class="fakern" style="margin-right:'+((kern)/1000*fontSize)+'px">'+cur+'</span>';
+                }
+
+                strn += cur;
+            });
+
+            $(node).replaceWith(strn);
+
+        },
+        
+        /*
+         *  Traverse the HTML DOM hierarchy in order to kern selected pairs of characters
+         *  @function
+         *  @private
+         *  @param {Array} nodes The array of nodes to traverse
+         */
+        _traverseHTML = function(nodes) {
+            var strn = '',
+                tagAtts, tagStart, tagEnd;
+            for(var i=0; i<nodes.length; ++i) {
+                if(nodes[i].nodeType === 3) {
+                    strn += _kernTextNode(nodes[i]);
+                }
+                else {
+                    // kerned or not, we will preserve the existing tag with its attributes!
+                    strn += tagStart + _traverseHTML( $(nodes[i]).contents() ) + tagEnd;
+                }                  
+            }
+
+            return strn;
+        },
+
+        rootNode;
 
         /*
          *  @private
          *  @param {Object} pairs Default kerning values 
          */
-        var pairs = opts.pairs || {
+        pairs = opts.pairs || {
             A : [['y', -92],
                  ['w', -92],
                  ['v', -74],
@@ -257,250 +487,12 @@
 
             y : [['.', -65],
                  [',', -65]]
-        },
-
-        /*
-         *  Searches for a value inside a multiple array
-         *  @function 
-         *  @private
-         *  @param {number|string} val The needle
-         *  @param {array} ar The haystack
-         *  @param {boolean} [strict=false] Strict type comparison
-         *  @returns {boolean|array} False if value is not present | The last array in the hierarchy that the value was present in
-         */
-        _inMultiArray = function(val, ar, strict) {
-            if(!ar) {
-                return false;
-            }
-
-            var ret = [];
-            strict = strict || false;
-            
-            for(var i=0; i<ar.length; ++i) {                
-                if( (strict && ar[i] === val) ||
-                    (!strict && ar[i] == val)) {
-                    return ar;
-                }
-                else {
-                    if($.isArray( ar[i] )) {
-                        if(ret = _inMultiArray(val, ar[i], strict)) {
-                            return ret;
-                        }
-                    }
-                    else {
-                        return false;               
-                    }
-                }
-            }            
-        },
-
-        /*
-         *  Checks if a letter should be excluded. If next isn't available, and the letter exists in the excluded,
-         *  then all letter combinations for that letter will be excluded
-         *  @function
-         *  @private
-         *  @param {char} letter The letter to check for exclusion
-         *  @param {char} [next=-1] The next letter to kern with
-         *  @returns {boolean} True is the letter is to be excluded
-         */
-        _isExcluded = function(letter, next) {
-            var obj = opts.exclude,
-                next = next || -1;
-
-            if(obj.hasOwnProperty(letter)) {
-                if(obj[letter] === true || $.inArray(next, obj[letter]) !== -1) {
-                    return true;
-                }
-            }
-
-            return false;
-        },
-               
-        /*
-         *  Checks if two letters should be kerned
-         *  @function 
-         *  @private
-         *  @param {string} l The letter on the left, which should be kerned
-         *  @param {string} r The letter on the right. If present, the letter on the left will be kerned
-         *  @returns {boolean|number} False if the letter should not be kerned | The negative kern value of that letter
-         */
-        _shouldKern = function(l, r) {
-            var ret = _inMultiArray(r, pairs[l]);
-
-            if ( !pairs[l] || _isExcluded(l, r) || ret === false || ret === undefined )  {
-                return false;
-            }
-
-            return ret[1];
-        },
-
-        /*
-         *  Checks if an element has a 'block' display type
-         *  @function
-         *  @private
-         *  @param {DOMObject} node The node to be inspected inspect
-         *  @returns {Boolean} True if the element has a block display
-         */
-        _isBlockDisplay = function(node) {
-            if(node.nodeType === 3) {
-                return false;
-            }
-
-            var display,
-                gcs = "getComputedStyle" in window;
-
-            display = (gcs ? window.getComputedStyle(node, null) : node.currentStyle).display; 
-			
-			console.log("checking",node,"for block display", display)
-            return display === 'block';
-        },
-
-        /*
-         *  Look for the next character anywhere within the defined hierarchy.
-         *  @function
-         *  @private
-         *  @param {DOMObject} node The current node being kerned
-         *  @param {Boolean} skipFirst On a first call the current node needs to be skipped
-         *  @return {null|char} If available, the next consecutive character
-         */
-        _getNextInlineCharacter = function(node, skipFirst) {
-            if (node.parentNode !== rootNode && node !== rootNode && _isBlockDisplay(node) ) {
-                return null;
-            }
-
-            if ( skipFirst ) {
-                if ( node.nextSibling ) {
-                    node = node.nextSibling;
-                    skipFirst = false;
-                }
-            }
-
-            while ( node && !skipFirst) {
-                if ( _isBlockDisplay(node) ) {
-                    return null;
-                }
-
-                var text = $(node).text();
-                if ( text && text !== '' ) {
-                    return text[0];
-                }
-                
-                if ( node.nextSibling ) {
-                    node = node.nextSibling;
-                }   
-                else {
-                    break;
-                }
-            }
-
-            while ( node.parentNode !== rootNode && node !== rootNode ) {
-                while ( node.parentNode.nextSibling ) {
-                	// make sure the current node isn't a blocked display, as well as its sibbling
-                    if ( _isBlockDisplay(node.parentNode.nextSibling) || _isBlockDisplay(node.parentNode) || _isBlockDisplay(node)) {
-                        return null;
-                    }
-
-                    ltr = _getNextInlineCharacter(node.parentNode.nextSibling);
-                    
-                    if ( ltr ) {
-                        return ltr;
-                    }
-                    
-                    node = node.parentNode.nextSibling;
-                }
-
-                node = node.parentNode;
-            }
-
-            return null;
-        },
-
-        /*
-         *  Apply kerning to a text node based on paired values
-         *  @function
-         *  @private
-         *  @param {DOMObject} node The Text node to kern
-         *  @returns {string} The new string of kerned characters, as applicable
-         */
-        _kernTextNode = function(node) {
-            var $node = $(node),
-                text = $node.text(),
-                ltrs = text.split(''),
-                strn = '',
-                len = ltrs.length,
-                fontSize = parseInt($node.parent().css('fontSize'), 10); 
-            
-            $(ltrs).each(function(idx, ltr) {
-                var cur = ltr,
-                    nxt,
-                    kern;
-
-                if ( idx < len-1) {
-                    nxt = ltrs[idx+1]
-                } 
-                else {
-                    nxt = _getNextInlineCharacter(node, true);
-                    console.log('next is:',cur,nxt);
-                }
-
-                kern = _shouldKern(ltr, nxt);
-                if (nxt !== null && kern) {
-                    cur = '<span class="fakern" style="margin-right:'+((kern)/1000*fontSize)+'px">'+cur+'</span>';
-                }
-
-                strn += cur;
-            });
-            return strn;
-        },
-        
-        /*
-         *  Traverse the HTML DOM hierarchy in order to kern selected pairs of characters
-         *  @function
-         *  @private
-         *  @param {Array} nodes The array of nodes to traverse
-         *  @returns {String} The new kerned hierarchy
-         */
-        _traverseHTML = function(nodes) {
-            var strn = '',
-            	tagAtts, tagStart, tagEnd;
-            console.log(nodes)
-            for(var i=0; i<nodes.length; ++i) {
-                if(nodes[i].nodeType === 3) {
-                    strn += _kernTextNode(nodes[i]);
-                }
-                else {
-                	tagAtts = [], 
-                	tagStart = tagEnd = '';
-
-                    // array.join on node.attributes is so annoying in this case, i decided to loop through instead @Lo
-                    if(nodes[i].attributes.length > 0) {
-	                    for(var j=nodes[i].attributes.length-1; j>=0; --j) {
-	                    	var value = nodes[i].attributes[j].name +'="'+ nodes[i].attributes[j].value +'"';
-	                    	tagAtts.push(value);
-	                    }
-                    }
-
-                    tagAtts = (tagAtts.length > 0 ? ' '+tagAtts.join(' ') : '');
-                    						
-                    tagStart = '<' + nodes[i].tagName + tagAtts +'>';
-                    tagEnd = '</' + nodes[i].tagName +'>';
-
-                    // kerned or not, we will preserve the existing tag with its attributes!
-                    strn += tagStart + _traverseHTML( $(nodes[i]).contents() ) + tagEnd;
-                }                  
-            }
-
-            return strn;
-        },
-
-        rootNode;
-
+        }
         pairs = $.extend(pairs, opts.include);
 
         return this.each(function() {
             rootNode = this;
-            strn = _traverseHTML( this.childNodes );
-            $(this).html(strn);
+            _traverseHTML( this.childNodes );
         });
     };  
     

@@ -17,6 +17,7 @@ describe("Fakern", function() {
          var regString = '((<span)+(.)*(margin\\-right:)+(.)*){'+n+'}',
              regex = new RegExp(regString, 'ig'),
              matches = this.actual.match(regex);
+
          return matches;
         }
       });
@@ -25,16 +26,16 @@ describe("Fakern", function() {
   it("Should use default kerning pairs", function() {
     // no opts - use defaults!
     $('#test').html('AV').fakern(); 
-    expect( $('#test').html() ).toContain('margin-right:-1.62');
+    expect( $('#test').html() ).toContain('margin-right: -1.62');
 
     $('#test').html('wo').fakern(); 
-    expect( $('#test').html() ).toContain('margin-right:-0.1');
+    expect( $('#test').html() ).toContain('margin-right: -0.1');
 
     $('#test').html('rg').fakern(); 
-    expect( $('#test').html() ).toContain('margin-right:-0.21599999999999997');
+    expect( $('#test').html() ).toContain('margin-right: -0.216');
 
     $('#test').html(' A').fakern(); 
-    expect( $('#test').html() ).toContain('margin-right:-0.66');
+    expect( $('#test').html() ).toContain('margin-right: -0.66');
   });
 
   it("Should overide kerning pairs", function() {
@@ -43,10 +44,10 @@ describe("Fakern", function() {
     expect( $('#test').html() ).toContain('span');
 
     $('#test').html(',F').fakern(opts); 
-    expect( $('#test').html() ).toContain('margin-right:-1.2000000000000002');
+    expect( $('#test').html() ).toContain('margin-right: -1.2');
 
     $('#test').html(',W').fakern(opts); 
-    expect( $('#test').html() ).toContain('margin-right:-0.72');
+    expect( $('#test').html() ).toContain('margin-right: -0.72');
 
     $('#test').html('AV').fakern(opts); 
     expect( $('#test').html() ).toEqual('AV');
@@ -141,8 +142,15 @@ describe("Fakern", function() {
 	
 	html = $('#test').html(htmlString).fakern();
 
-	expect( $('#test').html() ).toKernNTimes(7);
+	expect( $('#test').html() ).toKernNTimes(3);
   });
+    
+    it("Should preserve events after kerning", function() {
+        window.TESTVALUE = false;
+        $('#test').html('<span id="clicker" onclick="window.TESTVALUE=true">V</span>A').fakern();
+        $('#clicker').trigger('click');
+        expect(window.TESTVALUE).toBeTruthy();
+    });
 
 });
 

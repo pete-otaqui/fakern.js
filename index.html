@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fakern.js</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  	<link rel="stylesheet" type="text/css" href="jquery.fakern.css">
+  	<script type="text/javascript" src="jquery.js"></script>
+  	<script type="text/javascript" src="jquery.fakern.js"></script>
+  	<script>
+  		$(document).ready(function() {
+  			$('div#mutliline-html').fakern();
+  		});
+  	</script>
+</head>
+<body>
+<div id="mutliline-html">
+    <span class="1">A</span>V
+  	<span class="1-2">AV</span>
+	<div id="one" class="whatever">
+		A<span class="2">V</span>
+		<div>A<p class="inline">V</p><span id="two"><span>A</span></span>
+		</div>
+	</div>
+	<div class="inline">V</div><div class="inline">A</div>
+  </div>
+</div>
+</body>
+</html>

@@ -120,9 +120,28 @@ describe("Fakern", function() {
       
       var html = $('#test div:last').html();
       
-    expect( $('#test').html() ).toKernNTimes(5);
+	  expect( $('#test').html() ).toKernNTimes(5);
     }    
 
+  });
+
+  it("Should kern elements with inline display only, with a multiple line structure, while supporting existing HTML tags", function() {
+  	// remove multilines here to do a proper test ;)
+  	var htmlString = "<span>A</span>V\n\
+  		<span>AV</span>\n\
+		<div id=\"one\" class=\"whatever\">\n\
+			A<span>V</span>\n\
+			<div>A\n\
+				<p class=\"inline\">V</p>\n\
+				<span id=\"two\"><span>A</span></span>\n\
+			</p>\n\
+		</div>\n\
+		<div>V</div>\n\
+		<div class=\"inline\">A</span>",
+	
+	html = $('#test').html(htmlString).fakern();
+
+	expect( $('#test').html() ).toKernNTimes(7);
   });
 
 });

@@ -53,7 +53,8 @@
                  ['Q', -55],
                  ['O', -55],
                  ['G', -40],
-                 ['C', -40]],
+                 ['C', -40],
+                 [' ', -40]],
 
             B : [['U', -10],
                  ['A', -35]],
@@ -257,7 +258,7 @@
             y : [['.', -65],
                  [',', -65]]
         },
-        
+
         /*
          *  Searches for a value inside a multiple array
          *  @function 
@@ -349,7 +350,8 @@
                 gcs = "getComputedStyle" in window;
 
             display = (gcs ? window.getComputedStyle(node, null) : node.currentStyle).display; 
-
+			
+			console.log("checking",node,"for block display", display)
             return display === 'block';
         },
 
@@ -362,7 +364,7 @@
          *  @return {null|char} If available, the next consecutive character
          */
         _getNextInlineCharacter = function(node, skipFirst) {
-            if ( _isBlockDisplay(node) ) {
+            if (node.parentNode !== rootNode && node !== rootNode && _isBlockDisplay(node) ) {
                 return null;
             }
 
@@ -378,8 +380,9 @@
                     return null;
                 }
 
-                if ( $(node).text() && $(node).text() !== '' ) {
-                    return $(node).text()[0];
+                var text = $(node).text();
+                if ( text && text !== '' ) {
+                    return text[0];
                 }
                 
                 if ( node.nextSibling ) {
@@ -392,7 +395,8 @@
 
             while ( node.parentNode !== rootNode && node !== rootNode ) {
                 while ( node.parentNode.nextSibling ) {
-                    if ( _isBlockDisplay(node.parentNode.nextSibling) ) {
+                	// make sure the current node isn't a blocked display, as well as its sibbling
+                    if ( _isBlockDisplay(node.parentNode.nextSibling) || _isBlockDisplay(node.parentNode) || _isBlockDisplay(node)) {
                         return null;
                     }
 
@@ -436,6 +440,7 @@
                 } 
                 else {
                     nxt = _getNextInlineCharacter(node, true);
+                    console.log('next is:',cur,nxt);
                 }
 
                 kern = _shouldKern(ltr, nxt);
@@ -457,21 +462,31 @@
          */
         _traverseHTML = function(nodes) {
             var strn = '',
-                tagAtts, tagStart, tagEnd;
-
+            	tagAtts, tagStart, tagEnd;
+            console.log(nodes)
             for(var i=0; i<nodes.length; ++i) {
                 if(nodes[i].nodeType === 3) {
                     strn += _kernTextNode(nodes[i]);
                 }
                 else {
-                    // extend the attributes array to support Array methods
-                    atts = $.extend([], nodes[i].attributes);
-                    atts = atts.length > 0 ? ' '+atts.join(' ') : '';
-                    start = '<' + nodes[i].tagName + atts +'>';
-                    end = '</' + nodes[i].tagName +'>';
+                	tagAtts = [], 
+                	tagStart = tagEnd = '';
+
+                    // array.join on node.attributes is so annoying in this case, i decided to loop through instead @Lo
+                    if(nodes[i].attributes.length > 0) {
+	                    for(var j=nodes[i].attributes.length-1; j>=0; --j) {
+	                    	var value = nodes[i].attributes[j].name +'="'+ nodes[i].attributes[j].value +'"';
+	                    	tagAtts.push(value);
+	                    }
+                    }
+
+                    tagAtts = (tagAtts.length > 0 ? ' '+tagAtts.join(' ') : '');
+                    						
+                    tagStart = '<' + nodes[i].tagName + tagAtts +'>';
+                    tagEnd = '</' + nodes[i].tagName +'>';
 
                     // kerned or not, we will preserve the existing tag with its attributes!
-                    strn += start + _traverseHTML( $(nodes[i]).contents() ) + end;
+                    strn += tagStart + _traverseHTML( $(nodes[i]).contents() ) + tagEnd;
                 }                  
             }
 

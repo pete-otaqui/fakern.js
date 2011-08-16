@@ -14,7 +14,7 @@ describe("Fakern", function() {
      $('#test').html('');
       this.addMatchers({
         toKernNTimes: function(n) {
-         var regString = '((<span)+(.)*(margin\\-right:)+(.)*){'+n+'}',
+         var regString = '(<span+(.)*margin\\-right:+(.)*){'+n+'}',
              regex = new RegExp(regString, 'ig'),
              matches = this.actual.match(regex);
 
@@ -126,31 +126,22 @@ describe("Fakern", function() {
 
   });
 
-  it("Should kern elements with inline display only, with a multiple line structure, while supporting existing HTML tags", function() {
-  	// remove multilines here to do a proper test ;)
-  	var htmlString = "<span>A</span>V\n\
-  		<span>AV</span>\n\
-		<div id=\"one\" class=\"whatever\">\n\
-			A<span>V</span>\n\
-			<div>A\n\
-				<p class=\"inline\">V</p>\n\
-				<span id=\"two\"><span>A</span></span>\n\
-			</p>\n\
-		</div>\n\
-		<div>V</div>\n\
-		<div class=\"inline\">A</span>",
-	
-	html = $('#test').html(htmlString).fakern();
+  it("Should preserve events after kerning", function() {
+      window.TESTVALUE = false;
+      $('#test').html('<span id="clicker" onclick="window.TESTVALUE=true">V</span>A').fakern();
+      $('#clicker').trigger('click');
+      expect(window.TESTVALUE).toBeTruthy();
+  });
 
-	expect( $('#test').html() ).toKernNTimes(3);
+  it("Should kern elements with inline display only, with a multiple line structure, while supporting existing HTML tags", function() {
+  	var htmlString = '<span class="1">A</span>V<span class="1-2">AV</span><div id="one">A<span class="2">V</span><div>A<p class="inline">V</p><span id="two"><span>A</span></span></div></div><div class="inline">V</div><div class="inline">A</div></div>',
+	
+    html = $('#test').html(htmlString).fakern();
+
+  	expect( $('#test').html() ).toKernNTimes(7);
   });
     
-    it("Should preserve events after kerning", function() {
-        window.TESTVALUE = false;
-        $('#test').html('<span id="clicker" onclick="window.TESTVALUE=true">V</span>A').fakern();
-        $('#clicker').trigger('click');
-        expect(window.TESTVALUE).toBeTruthy();
-    });
+    
 
 });
 

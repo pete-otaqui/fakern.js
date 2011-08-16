@@ -253,15 +253,12 @@
                 tagAtts, tagStart, tagEnd;
             for(var i=0; i<nodes.length; ++i) {
                 if(nodes[i].nodeType === 3) {
-                    strn += _kernTextNode(nodes[i]);
+                     _kernTextNode(nodes[i]);
                 }
                 else {
-                    // kerned or not, we will preserve the existing tag with its attributes!
-                    strn += tagStart + _traverseHTML( $(nodes[i]).contents() ) + tagEnd;
-                }                  
+                    _traverseHTML( $(nodes[i]).contents() );
+                }
             }
-
-            return strn;
         },
 
         rootNode;

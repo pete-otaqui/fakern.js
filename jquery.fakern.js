@@ -1,9 +1,17 @@
 /*
  *  The Fakern plugin will apply kerning values on specific letter combinations.
- *  The values for the pairs were taken from a sample list from the Adobe site
+ *  The default values for the pairs were taken from a sample list from the Adobe site
  *  http://partners.adobe.com/public/developer/opentype/index_kerning1.html
- *  The plugin will factor all values by the element's font-size regardless of its unit. 
- *  It will force pixels as kerning units, in order to avoid doctype issues.
+ *  The plugin will factor all values by the parent element's font-size regardless of its unit. 
+ *  It will force pixels as kerning units, in order to avoid doctype problems.
+ *
+ *  How to calculate kerning values:
+ *  Tracking and kerning are both measured in 1/1000 em, a unit of measure that is relative to the current type size. 
+ *  In a 6‑point font, 1 em equals 6 points; in a 10‑point font, 1 em equals 10 points.
+ *  Long story short, to calculate your values in EMs do the following:
+ *  Say you want a 2px kern, and have a 29px font: (2px kern * 1000 / 29px fontsize). Your kern metric value is: -68.9655
+ *  Kerning and tracking are strictly proportional to the current type size.
+ *
  *  The project is sponsored by Mangahigh.com
  *  
  *  @example
@@ -19,8 +27,20 @@
  *      }
  *  });
  *  
+ *  @example
+ *  You can also pass an entire pairs property to overide the default values entirely.
+ *
+ *  $('body').fakern({ 
+ *      pairs : {
+ *          A : [['y', -92],
+ *               ['w', -92]]
+ *      }
+ *  });
+ *  
+ *  
  *  @author <a href="http://lcampanis.com" target="_blank">Lorenzo Campanis</a>
- *  @author <a href="http://otaqui.com" target="_blank">Pete Otaqui</a>, 
+ *  @author <a href="http://otaqui.com" target="_blank">Pete Otaqui</a>
+ *  @author <a href="http://otaqui.com" target="_blank">Gustaf Barkeling</a>
  */
 (function($) {
     

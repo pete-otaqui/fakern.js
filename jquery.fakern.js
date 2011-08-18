@@ -40,7 +40,7 @@
  *  
  *  @author <a href="http://lcampanis.com" target="_blank">Lorenzo Campanis</a>
  *  @author <a href="http://otaqui.com" target="_blank">Pete Otaqui</a>
- *  @author <a href="http://otaqui.com" target="_blank">Gustaf Barkeling</a>
+ *  @author <a href="http://www.linkedin.com/in/barkeling" target="_blank">Gustaf Barkeling</a>
  */
 (function($) {
     
@@ -180,11 +180,11 @@
                     return null;
                 }
 
-                var text = $(node).text();
+                var text = $(node).text(); // innerText for ie
                 if ( text && text !== '' ) {
                     return text[0];
                 }
-                
+
                 if ( node.nextSibling ) {
                     node = node.nextSibling;
                 }   
@@ -192,11 +192,13 @@
                     break;
                 }
             }
-
             while ( node.parentNode !== rootNode && node !== rootNode ) {
                 while ( node.parentNode.nextSibling ) {
-                	// make sure the current node isn't a blocked display, as well as its sibbling
-                    if ( _isBlockDisplay(node.parentNode.nextSibling) || _isBlockDisplay(node.parentNode) || _isBlockDisplay(node)) {
+                	// make sure the current node and it's right sibling aren't blocks, and that the current nodes parent isnt already kerned
+                    if (   _isBlockDisplay(node.parentNode.nextSibling)
+                        || _isBlockDisplay(node.parentNode) 
+                        || _isBlockDisplay(node)
+                        || node.parentNode.style.marginRight ) {
                         return null;
                     }
 
@@ -229,7 +231,6 @@
                 len = ltrs.length,
                 fontSize = parseInt($node.parent().css('fontSize'), 10),
                 nodeIndex = -1;
-            
             $(node.parentNode.childNodes).each(function(idx, nde) {
                 if ( nde == node ) {
                     nodeIndex = idx;
@@ -267,10 +268,8 @@
          *  @param {Array} nodes The array of nodes to traverse
          */
         _traverseHTML = function(nodes) {
-            var strn = '',
-                tagAtts, tagStart, tagEnd;
             for(var i=0; i<nodes.length; ++i) {
-                if(nodes[i].parentNode !== rootNode && $(nodes[i].parentNode).is("[styles*='margin-right']")) {
+                if(nodes[i].parentNode !== rootNode && nodes[i].parentNode.style.marginRight) {
                     continue;
                 }
                 

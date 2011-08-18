@@ -270,6 +270,10 @@
             var strn = '',
                 tagAtts, tagStart, tagEnd;
             for(var i=0; i<nodes.length; ++i) {
+                if(typeof nodes[i].style.marginRight !== "undefined") {
+                    continue;
+                }
+                
                 if(nodes[i].nodeType === 3) {
                      _kernTextNode(nodes[i]);
                 }

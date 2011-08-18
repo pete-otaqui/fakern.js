@@ -1,5 +1,4 @@
-body { font-family:arial; font-size:62.5%; }
-#test { font-size:2.9em; }
+body { font-family:arial; font-size:12px; }
 p { margin:0; }
 .fakern { color: #f00; }
 .inline { display:inline; }

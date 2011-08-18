@@ -133,7 +133,7 @@ describe("Fakern", function() {
       expect(window.TESTVALUE).toBeTruthy();
   });
 
-  it("Should kern elements with inline display only, with a multiple line structure, while supporting existing HTML tags", function() {
+  it("Should kern elements with inline display only, while supporting existing HTML tags", function() {
   	var htmlString = '<span class="1">A</span>V<span class="1-2">AV</span><div id="one">A<span class="2">V</span><div>A<p class="inline">V</p><span id="two"><span>A</span></span></div></div><div class="inline">V</div><div class="inline">A</div></div>',
 	
     html = $('#test').html(htmlString).fakern();

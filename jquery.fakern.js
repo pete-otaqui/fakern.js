@@ -270,7 +270,7 @@
             var strn = '',
                 tagAtts, tagStart, tagEnd;
             for(var i=0; i<nodes.length; ++i) {
-                if(typeof nodes[i].style.marginRight !== "undefined") {
+                if(nodes[i].parentNode !== rootNode && $(nodes[i].parentNode).is("[styles*='margin-right']")) {
                     continue;
                 }
                 

@@ -180,7 +180,7 @@
                     return null;
                 }
 
-                var text = $(node).text();
+                var text = $(node).text(); // innerText for ie
                 if ( text && text !== '' ) {
                     return text[0];
                 }

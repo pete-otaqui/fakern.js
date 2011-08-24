@@ -40,7 +40,7 @@
  *  
  *  @author <a href="http://lcampanis.com" target="_blank">Lorenzo Campanis</a>
  *  @author <a href="http://otaqui.com" target="_blank">Pete Otaqui</a>
- *  @author <a href="http://otaqui.com" target="_blank">Gustaf Barkeling</a>
+ *  @author <a href="http://www.linkedin.com/in/barkeling" target="_blank">Gustaf Barkeling</a>
  */
 (function($) {
     
@@ -182,7 +182,7 @@
                 if ( text && text !== '' ) {
                     return text[0];
                 }
-                
+
                 if ( node.nextSibling ) {
                     node = node.nextSibling;
                 }   
@@ -257,8 +257,6 @@
          *  @param {Array} nodes The array of nodes to traverse
          */
         _traverseHTML = function(nodes) {
-            var strn = '',
-                tagAtts, tagStart, tagEnd;
             for(var i=0; i<nodes.length; ++i) {
                 if(nodes[i].parentNode !== rootNode && nodes[i].parentNode.style.marginRight !== "") {
                     continue;

@@ -8,7 +8,7 @@
   	<script type="text/javascript" src="jquery.fakern.js"></script>
   	<script>
   		$(document).ready(function() {
-  			$('div#test').fakern(/*{
+        /*{
           pairs : {
             A : [['Y',-68.9655],['W',-34.48275],['V',-68.9655],['T',-68.9655]],
             D : [['Y',34.48275],['W',34.48275],['V',34.48275]],
@@ -25,12 +25,17 @@
             v : [['.',-68.9655],[',',-68.9655]],
             y : [['.',-68.9655],[',',-68.9655]]
           }   
-        }*/);
+        }*/
+  			$('div#test1').fakern();
+        $('div#test2').fakern();
   		});
+      
   	</script>
 </head>
 <body>
-<div id="test">
-<span class="1">A</span><img src="http://www.gravatar.com/avatar/9b63b564ffb48921be9317220877e430?rating=PG&size=24&default=" />W<span class="1-2">AV</span><div id="one">A<span class="2">V</span><div>A<p class="inline">V</p><span id="two"><span>A</span></span></div></div><div class="inline">V</div><div class="inline">A</div></div>
+<div id="test1">
+V<span class="1">A</span><img src="http://www.gravatar.com/avatar/9b63b564ffb48921be9317220877e430?rating=PG&size=24&default=" />W<span class="1-2">AV</span><div id="one">A<span class="2">V</span><div>A<p class="inline">V</p><span id="two"><span>A</span></span></div></div><div class="inline">V</div><div class="inline">A</div></div>
+
+<div id="test2">AVAWAY</div>
 </body>
 </html>

@@ -143,12 +143,16 @@
          *  @returns {Boolean} True if the element has a block display
          */
         _isBlockDisplay = function(node) {
-            if(node.nodeType === 3) {
+            var exceptions = ['IMG','AUDIO','BUTTON','CANVAS','CODE','EMBED','FIGURE', 'FRAME', 'FRAMESET', 'IFRAME','INPUT','OBJECT','TABLE','TEXTAREA','VIDEO','APPLET'],
+                display,
+                gcs = "getComputedStyle" in window;
+
+            if(!node || node.nodeType === 3) {
                 return false;
             }
-
-            var display,
-                gcs = "getComputedStyle" in window;
+            else if($.inArray(node.tagName, exceptions) !== -1) {
+                return true;
+            }            
 
             display = (gcs ? window.getComputedStyle(node, null) : node.currentStyle).display; 
 
@@ -161,25 +165,19 @@
          *  @private
          *  @param {DOMObject} node The current node being kerned
          *  @param {Boolean} skipFirst On a first call the current node needs to be skipped
-         *  @return {null|char} If available, the next consecutive character
+         *  @returns {null|char} If available, the next consecutive character
          */
         _getNextInlineCharacter = function(node, skipFirst) {
-            if (node.parentNode !== rootNode && node !== rootNode && _isBlockDisplay(node) ) {
+            if (node === rootNode) {
                 return null;
             }
 
-            if ( skipFirst ) {
-                if ( node.nextSibling ) {
-                    node = node.nextSibling;
-                    skipFirst = false;
-                }
+            if ( skipFirst && node.nextSibling ) {
+                node = node.nextSibling;
+                skipFirst = false;
             }
 
-            while ( node && !skipFirst) {
-                if ( _isBlockDisplay(node) ) {
-                    return null;
-                }
-
+            while (node && !skipFirst) {
                 var text = $(node).text();
                 if ( text && text !== '' ) {
                     return text[0];
@@ -192,11 +190,11 @@
                     break;
                 }
             }
-
-            while ( node.parentNode !== rootNode && node !== rootNode ) {
+            
+            while ( node && node !== rootNode ) {
                 while ( node.parentNode.nextSibling ) {
                 	// make sure the current node isn't a blocked display, as well as its sibbling
-                    if ( _isBlockDisplay(node.parentNode.nextSibling) || _isBlockDisplay(node.parentNode) || _isBlockDisplay(node)) {
+                    if ( _isBlockDisplay(node) || _isBlockDisplay(node.parentNode) || _isBlockDisplay(node.parentNode.nextSibling) ) {
                         return null;
                     }
 
@@ -227,14 +225,7 @@
                 ltrs = text.split(''),
                 strn = '',
                 len = ltrs.length,
-                fontSize = parseInt($node.parent().css('fontSize'), 10),
-                nodeIndex = -1;
-            
-            $(node.parentNode.childNodes).each(function(idx, nde) {
-                if ( nde == node ) {
-                    nodeIndex = idx;
-                }
-            });
+                fontSize = parseInt($node.parent().css('fontSize'), 10);
             
             $(ltrs).each(function(idx, ltr) {
                 var cur = ltr,
@@ -257,7 +248,6 @@
             });
 
             $(node).replaceWith(strn);
-
         },
         
         /*
@@ -270,10 +260,10 @@
             var strn = '',
                 tagAtts, tagStart, tagEnd;
             for(var i=0; i<nodes.length; ++i) {
-                if(nodes[i].parentNode !== rootNode && $(nodes[i].parentNode).is("[styles*='margin-right']")) {
+                if(nodes[i].parentNode !== rootNode && nodes[i].parentNode.style.marginRight !== "") {
                     continue;
                 }
-                
+
                 if(nodes[i].nodeType === 3) {
                      _kernTextNode(nodes[i]);
                 }

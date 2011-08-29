@@ -48,13 +48,15 @@
      *  @param {Object} [opts] Additional options
      *  @param {Object} [opts.include] A list of multidimentional arrays with additional letter combinations. 
      *  @param {Object} [opts.exclude] A list of multidimentional arrays with letter combinations to be excluded or set some letters to true to exclude all letter combinations
+     *  @param {Boolean} [opts.overrideKern] Set to true if we should override browsers native kerning
      *  @param {Object} [opts.pairs] A hash of character pair kerning values, if not supplied the default Roman set will be used instead.
      */
     $.fn.fakern = function(opts) {
         
         opts = $.extend({
             exclude : {},
-            include : {}
+            include : {},
+            overrideKern : false
         }, opts);
         
         
@@ -269,6 +271,35 @@
                     _traverseHTML( $(nodes[i]).contents() );
                 }
             }
+        },
+
+        /*
+         *  Finds out if browser is natively kerning
+         *  @function
+         *  @private
+         *  @return {Boolean} True if kerning has been detected
+         */
+        _nativeKern = function() {
+            var el,
+                testString = 'AVAVAVAVAVAVAVAVAVAVAVAV',
+                unkernedWidth = 312 - 10, // expected width of testString minus safety margin
+                width;
+                
+            // create and normalize styling of test container
+            el = document.createElement('div');
+            el.style.cssFloat = 'left';
+            el.style.fontSize = '20px'; // firefox disables kerning if fontSize is below 20px
+            el.style.fontWeight = 'normal';
+            el.style.textRendering = 'optimizeLegibility';
+            el.innerHTML = testString;
+            
+            document.body.appendChild(el);
+
+            width = el.offsetWidth;
+
+            document.body.removeChild(el);
+
+            return width < unkernedWidth;
         },
 
         rootNode;
@@ -499,7 +530,15 @@
 
         return this.each(function() {
             rootNode = this;
-            _traverseHTML( this.childNodes );
+
+            if ( opts.overrideKern || !_nativeKern() ) {
+                rootNode.style.textRendering = 'optimizeSpeed';
+                _traverseHTML( this.childNodes );
+            } else {
+                rootNode.style.textRendering = 'optimizeLegibility';
+            }
+
+            
         });
     };  
     

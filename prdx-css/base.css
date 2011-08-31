@@ -1,0 +1,724 @@
+/*
+ * SEE THE BOTTOM OF THE FILE FOR MORE IMPORTS
+ */
+@import url(reset.css);
+@import url(prodigi-fonts.css);
+@import url(jquery-ui-1.8.12.custom.css);
+@import url(prodigi-richtext.css);
+
+
+/*************** BASE STYLING ****************/
+
+.prodigi-x-container {
+    font: 14px Arial, Helvetica, sans-serif;
+    color: #000;
+    position: relative;
+    width: 875px;
+}
+
+#ajax-loader {
+    width:100%;
+    height:100%;
+    top:0;
+    left:0;
+    position:absolute;
+    z-index:10000;
+}
+#ajax-loader div {
+    position:absolute;
+    height:46px;
+    width:220px;
+    top:50%;
+    left:50%;
+    margin-top: -23px;
+    margin-left: -110px;
+    background:#ffffff url(../img/ajax-loader.gif) no-repeat 0 0;
+}
+#ajax-loader.loaded div {
+    background-position: 0px -46px;
+}
+.prodigi-x-container a, 
+.prodigi-x-container button, 
+.prodigi-x-container label { cursor: pointer; }
+.prodigi-x-container a { color: #000; text-decoration: underline; }
+.prodigi-x-container strong { font-weight: bold; }
+.prodigi-x-container em { font-style: italic; }
+
+.prodigi-x-container .ui-button,
+.prodigi-x-container .ui-widget .ui-button { font-size: 12px; }
+
+.prodigi-x-container .editing {
+    position: relative;
+    z-index: 50;
+    overflow: hidden;
+}
+
+.fade-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 20;
+    background: #000;
+    opacity: 0.6;
+}
+.fade-overlay-active .ui-dialog-titlebar-close { visibility: hidden; }
+
+
+/*************** MAIN LAYOUT ****************/
+
+.prodigi-x-container .main {
+    background-color: #696969;
+    border: 1px solid #9f9f9f;
+    -webkit-border-radius: 7px;
+    -moz-border-radius: 7px;
+    border-radius: 7px;
+    padding: 8px;
+}
+
+.prodigi-x-container .tab {
+    width: 872px;
+    min-height:455px;
+    -webkit-border-radius: 7px;
+    -moz-border-radius: 7px;
+    border-radius: 7px;
+    background-color: #fff;
+    position:relative;
+}
+.prodigi-x-container #hints-and-solutions { display:none; } /* this tab is hidden on page load */
+
+/*************** TAB NAVIGATION ****************/
+
+.prodigi-x-container .tabs {
+    height: 25px;
+    padding-left: 18px;
+    display: inline-block;
+}
+.prodigi-x-container .tabs li {
+    background-color: #909090;
+    -webkit-border-top-left-radius: 7px;
+    -webkit-border-top-right-radius: 7px;
+    -moz-border-radius-topleft: 7px;
+    -moz-border-radius-topright: 7px;
+    border-top-left-radius: 7px;
+    border-top-right-radius: 7px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    display: inline-block;
+}
+.prodigi-x-container .tabs li.active { background-color: #fff; }
+.prodigi-x-container .tabs li a {
+    display: block;
+    padding: 3px 8px;
+    color: #fff;
+    text-decoration: none;
+}
+.prodigi-x-container .tabs li.active a { color: #6b6b6b; }
+
+
+/*************** QUESTION ****************/
+
+.prodigi-x-container #question,
+.prodigi-x-container #question .prodigi-richtext { width: 695px; }
+.prodigi-x-container #question {
+    border: 1px solid black;
+    position: relative;
+    margin: 18px auto 0;
+    background-color: #fff;
+    overflow: hidden;
+    height: 288px;
+}
+
+.prodigi-x-container.multipleChoice.layout-1 #question {
+    height: 288px;
+}
+.prodigi-x-container.multipleChoice.layout-2 #question {
+    height: 184px;
+}
+.prodigi-x-container.multipleChoice.layout-3 #question {
+    height: 288px;
+}
+
+.prodigi-x-container.dragAndDrop #question,
+.prodigi-x-container.dragAndDrop #question .prodigi-richtext { width: 467px; }
+.prodigi-x-container.dragAndDrop #question {
+    left: 80px;
+    height: 416px;
+    float: left;
+}
+
+.prodigi-x-container.infoPage #question {
+    height: 418px;
+}
+
+/*************** HOTSPOTS ****************/
+
+.prodigi-x-container #hotspots {
+    padding: 0;
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: visible;
+    /* compensating for flash boxmodel differences */
+    margin-left: -9px; 
+    margin-top: -3px;
+}
+.prodigi-x-container.layout-1 div.prodigi-hotspot {
+    width: 38px;
+}
+.prodigi-x-container.layout-2 div.prodigi-hotspot {
+    width: 68px;
+}
+.prodigi-x-container.layout-3 div.prodigi-hotspot {
+    width: 118px;
+}
+.prodigi-x-container.layout-4 div.prodigi-hotspot {
+    width: 168px;
+}
+.prodigi-x-container .prodigi-hotspots { position: relative; }
+.prodigi-x-container .prodigi-hotspot {
+    position:absolute;
+    background-color: #ccf4ff;
+    font-size: 10px;
+    opacity: 0.8;
+    cursor: move;
+    border: 2px dashed #6fe1fe;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    z-index: 6;
+    height: 32px;
+}
+.preview .prodigi-x-container .prodigi-hotspot,
+.mode-playback .prodigi-x-container .prodigi-hotspot {
+    cursor: auto ;
+}
+body.editing-question .prodigi-x-container .prodigi-hotspot { z-index:50; }
+
+.prodigi-x-container .prodigi-hotspots .hotspot-display-name { position:absolute; right:0; top:0; }
+.prodigi-x-container .prodigi-hotspots .dropped-labels { position:absolute; }
+
+
+.prodigi-x-container .prodigi-hotspot.ui-droppable-touched {
+    -webkit-box-shadow: 0px 0px 3px 0px #000000;
+    -moz-box-shadow: 0px 0px 3px 0px #000000;
+    box-shadow: 0px 0px 3px 0px #000000; 
+}
+.prodigi-x-container .prodigi-hotspot .prodigi-hotspot-content {
+    text-align: right;
+    font-weight: bold;
+    padding: 4px 1px 0 0;
+    color:#6FE1FE;
+}
+.prodigi-x-container .prodigi-hotspot .prodigi-hotspot-content .dropped-labels span {
+    font-size:22px;
+}
+.preview .prodigi-x-container .prodigi-hotspot.hotspot-invisible,
+.mode-playback .prodigi-x-container .prodigi-hotspot.hotspot-invisible,
+.preview .prodigi-x-container .prodigi-hotspot.hotspot-invisible.ui-droppable-touched,
+.mode-playback  .prodigi-x-container .prodigi-hotspot.hotspot-invisible.ui-droppable-touched { 
+    background-color:transparent;
+    -webkit-box-shadow:none;
+    -moz-box-shadow:none;
+    box-shadow:none;
+    border:0;
+}
+.prodigi-x-container .prodigi-hotspot.hotspot-invisible span.hotspot-display-name { display:none; }
+
+/*************** MULTIPLE CHOICE ANSWERS ****************/
+
+.prodigi-x-container #answer {
+    clear: left;
+    float: left;
+    margin: 10px 0 0 67px;
+    text-align: center;
+    width: 742px;
+}
+.prodigi-x-container .prodigi-item-answer {
+    display: inline-block;
+    position: relative;
+    border: 0 none;
+    margin: 0;
+    color: #fff;
+    background: transparent url(../img/answer-button-sprite.png) 0 0 no-repeat;
+    height: 117px;
+}
+
+.prodigi-x-container .prodigi-item-answer .prodigi-item-answer-radio {
+    background-color: #FFFFFF;
+    bottom: 6px;
+    color: #1B7DBC;
+    font-size: 9px;
+    font-weight: bold;
+    left: 6px;
+    position: absolute;
+    text-align: right;
+    text-transform: uppercase;
+    width: 74px;
+    -moz-border-radius: 0px 4px 0px 13px;
+    -webkit-border-radius: 0px 4px 0px 13px;
+    border-radius: 0px 4px 0px 13px; 
+}
+.prodigi-x-container.layout-3 .prodigi-item-answer .prodigi-item-answer-radio { 
+    -moz-border-radius-topright: 4px;
+    -moz-border-radius-topleft: 4px;
+    -webkit-border-radius: 4px 4px 0 0;
+    border-radius: 4px 4px 0 0; 
+    margin-left:8px;
+}
+.prodigi-x-container .prodigi-item-answer.editing .prodigi-item-answer-radio { display:none; }
+
+.prodigi-x-container.layout-1 .prodigi-item-answer,
+.prodigi-x-container.layout-1 .prodigi-item-answer .prodigi-richtext { width: 166px; }
+.prodigi-x-container.layout-1 .prodigi-item-answer.incorrect { background-position: -166px 0; }
+.prodigi-x-container.layout-1 .prodigi-item-answer.correct { background-position: -332px 0; }
+
+.prodigi-x-container.layout-2 .prodigi-item-answer,
+.prodigi-x-container.layout-2 .prodigi-item-answer .prodigi-richtext { width: 345px; }
+.prodigi-x-container.layout-2 .prodigi-item-answer { background-position: 0 -117px; }
+.prodigi-x-container.layout-2 .prodigi-item-answer.incorrect { background-position: -345px -117px; }
+.prodigi-x-container.layout-2 .prodigi-item-answer.correct { background-position: -690px -117px; }
+
+.prodigi-x-container.layout-3 .prodigi-item-answer,
+.prodigi-x-container.layout-3 .prodigi-item-answer .prodigi-richtext { width: 106px; }
+.prodigi-x-container.layout-3 .prodigi-item-answer { background-position: 0 -234px; }
+.prodigi-x-container.layout-3 .prodigi-item-answer.incorrect { background-position: -106px -234px; }
+.prodigi-x-container.layout-3 .prodigi-item-answer.correct { background-position: -212px -234px; }
+
+.prodigi-x-container .multipleChoice #show-correct { display: none; }
+
+/*************** HINTS AND SOLUTIONS ****************/
+
+.prodigi-x-container .hs,
+.prodigi-x-container .ui-dialog .hs { /* .ui-dialog selector needed to override jquery-ui style */
+    background-color: #50a121;
+    padding: 10px;
+    float: left;
+    margin: 10px;
+}
+.prodigi-x-container .hs h3 {
+    color: #fff;
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+.prodigi-x-container .hs .wrapper,
+.prodigi-x-container .hs .wrapper .prodigi-richtext { width: 393px; }
+.prodigi-x-container .hs .wrapper {
+    position: relative;
+    height: 358px;
+    border: 1px solid #fff;
+    overflow: hidden;
+    position: relative;
+    background-color: #50a121;
+}
+
+
+/*************** HINT ****************/
+
+
+/*************** SOLUTIONS ****************/
+.prodigi-x-container .prodigi-item-solutions {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    overflow: hidden;
+}
+.prodigi-x-container .prodigi-item-solution {
+    display: block;
+    position: relative;
+    float: left;
+    width: 393px;
+    height: 348px;
+    background-color: #50a121;
+}
+.prodigi-x-container .prodigi-richtext { min-height: 32px; }
+
+.prodigi-x-container .solutions-buttons { margin-top: 5px; }
+.prodigi-x-container .solutions-buttons .next { float: right; }
+
+.prodigi-x-container #solutions-dialog { display: none; }
+.prodigi-x-container .ui-dialog #solutions-dialog { display: block; }
+
+
+/*************** HINTS AND SOLUTIONS CONTROLS ****************/
+
+.prodigi-x-container .hs-controls { 
+    clear: both;
+    text-align: center;
+    margin: 0; 
+    padding: 12px 0 18px;
+}
+.prodigi-x-container .hs-controls a {
+    background-color: #585858;
+    border-radius: 7px 7px 7px 7px;
+    box-shadow: 0 1px 3px #000000 inset;
+    text-shadow: 0 1px 2px #000000;
+    display: inline-block;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #FFFFFF;
+    padding: 6px 10px;
+    text-decoration: none;
+    margin: 0 4px;
+}
+
+
+/*************** ACTIVATE EDITOR BUTTON ****************/
+
+.prodigi-x-container #editable-overlay {
+    color: #000;
+    position:absolute;
+    z-index: 3; 
+    top:0; 
+    left:0; 
+    width: 30px; 
+    height:30px; 
+    background-color: #eee;
+    border: 1px solid #ccc;
+    font-size: 24px;
+    text-align: center;
+    cursor: pointer;
+    color: #262626;
+}
+.prodigi-x-container #editable-overlay:active { background-color: #E0E0E0; }
+
+
+/*************** SHOW CORRECT ****************/
+.prodigi-x-container .dragAndDrop #show-correct {
+    margin:8px 18px 0;
+    float: right;
+    overflow:hidden;
+    width: 212px;
+}
+.prodigi-x-container .multipleChoice #show-correct { display:none; }
+.translate-source .prodigi-x-container #show-correct { margin:8px 0 0; }
+.prodigi-x-container .dragAndDrop #show-correct a.prodigi-show-correct {
+    background: transparent url(../img/submit-button-sprite.png) no-repeat 0 0;
+    display: block;
+    height: 77px;
+    color:#fff;
+    font-weight:bold;
+    text-align:center;
+    width: 166px;
+    margin:0 auto;
+    text-transform:uppercase;
+    line-height:77px;
+    text-decoration:none;   
+}
+.prodigi-x-container .dragAndDrop #show-correct a.prodigi-show-correct:hover {
+    background-position:0 100%;    
+}
+
+/*************** DRAG AND DROP ****************/
+.prodigi-x-container.dragAndDrop #labels {
+    float: right;
+    width: 212px;
+    margin: 18px 18px 0;
+    padding: 0;
+    height: 340px;
+    position:relative;
+    border: 1px solid #000;
+    overflow: hidden;
+}
+.prodigi-x-container.dragAndDrop div.prodigi-labels {
+    bottom: 0;
+    left: 0;
+    padding-top: 18px;
+    width:100%;
+    position: absolute;
+    right: 0;
+    top: 0;
+    overflow: auto;
+}
+
+.prodigi-x-container.dragAndDrop div.prodigi-labels div.prodigi-item-label {
+    border: 2px solid #1CD1FF;
+    margin: 0px auto 6px;
+}
+
+.prodigi-x-container.dragAndDrop.layout-1 div.prodigi-item-label {
+    width: 38px;
+}
+.prodigi-x-container.dragAndDrop.layout-2 div.prodigi-item-label {
+    width: 68px;
+}
+.prodigi-x-container.dragAndDrop.layout-3 div.prodigi-item-label {
+    width: 118px;
+}
+.prodigi-x-container.dragAndDrop.layout-4 div.prodigi-item-label {
+    width: 168px;
+}
+
+.trash-icon-wrapper { position:absolute; display:none; z-index:3; text-indent:-9999px; cursor:pointer; border:0; background-color:transparent; }
+.trash-icon-wrapper .ui-icon { background-color:transparent; }
+/* inside hotspots, after drag */
+.dropped-labels .prodigi-item-label-content { background-color:transparent; border:0; }
+/*preview overides */
+.preview .prodigi-x-container.dragAndDrop div.prodigi-item-label.ui-draggable-dragging { opacity:.3; background-color:#1C9ED4;  }
+.preview .prodigi-x-container.dragAndDrop div.prodigi-labels div.prodigi-item-label { border:0; }
+.preview .prodigi-x-container.dragAndDrop div.prodigi-labels .label {
+    webkit-box-shadow: 0px 0px 3px 2px #c9c9c9;
+    -moz-box-shadow: 0px 0px 3px 2px #c9c9c9;
+    box-shadow: 0px 0px 3px 2px #c9c9c9; 
+}
+
+/*************** GLOBAL VERTICAL CENTRED ALIGNMENT  ****************/
+/* for IE fix: http://www.emblematiq.com/blog/vertical_align_with_css/ */
+.prodigi-x-container .table-cell {
+    display: table-cell;
+    vertical-align: middle;
+    height:inherit;
+    width:inherit;
+}
+.prodigi-x-container .wrapper.editing .table-cell .prodigi-richtext {
+    overflow-y:hidden; 
+}
+.prodigi-x-container #question .table-cell {
+    overflow-y:auto;
+}
+
+
+/*************** TOOLBAR ****************/
+#toolbar {
+    font-size: 12px;
+}
+#toolbar .toolbar-settings { margin-top:5px; text-align:right; margin-right:1px; }
+
+#prodigi-toolbar .layouts li {
+    width:68px;
+    height:46px;
+    display:inline-block;
+    background-repeat: no-repeat;
+    background-image:url(../img/layouts-sprite.png);
+    cursor: pointer;
+    overflow: hidden;
+}
+#prodigi-toolbar .layouts li span {
+    display: block;
+    margin-left: -1000em;
+}
+#prodigi-toolbar .layouts li.small {
+    background-position: 0 0;
+}
+#prodigi-toolbar .layouts li.medium {
+    background-position: 0 -46px;
+}
+#prodigi-toolbar .layouts li.large {
+    background-position: 0 -92px;
+}
+.prodigi-dragAndDrop #prodigi-toolbar .layouts li.small {
+    background-position: 0 -138px;
+}
+.prodigi-dragAndDrop #prodigi-toolbar .layouts li.medium {
+    background-position: 0 -184px;
+}
+.prodigi-dragAndDrop #prodigi-toolbar .layouts li.large {
+    background-position: 0 -230px;
+}
+.prodigi-dragAndDrop #prodigi-toolbar .layouts li.huge {
+    background-position: 0 -276px;
+}
+
+#prodigi-toolbar .layouts li.small.selected {
+    background-position: -68px 0;
+}
+#prodigi-toolbar .layouts li.medium.selected {
+    background-position: -68px -46px;
+}
+#prodigi-toolbar .layouts li.large.selected {
+    background-position: -68px -92px;
+}
+.prodigi-dragAndDrop #prodigi-toolbar .layouts li.small.selected {
+    background-position: -68px -138px;
+}
+.prodigi-dragAndDrop #prodigi-toolbar .layouts li.medium.selected {
+    background-position: -68px -184px;
+}
+.prodigi-dragAndDrop #prodigi-toolbar .layouts li.large.selected {
+    background-position: -68px -230px;
+}
+.prodigi-dragAndDrop #prodigi-toolbar .layouts li.huge.selected {
+    background-position: -68px -276px;
+}
+
+#prodigi-toolbar .editor .wrapper { padding: 4px; }
+#editorSaveButton { float: right; }
+/* toolbar modules */
+.ui-accordion { clear:both; }
+.ui-accordion .ui-accordion-content { padding:10px; }
+.ui-accordion .ui-accordion-header { padding:3px 5px; }
+.ui-accordion.labels {
+    clear: right;
+    display: block;
+    float: left;
+    width: 49%;
+}
+.ui-accordion.hotspots {
+    float: left;
+    margin-right: 2%;
+    width: 49%;
+}
+
+/*************** DIALOGS ****************/
+.ui-dialog .ui-dialog-titlebar { font-size:12px; padding:3px; }
+.ui-dialog .ui-dialog-content { padding:5px 0; }
+.ui-dialog .ui-button { font-size:12px; }
+/* dialog specific */
+#preview-close { text-align:center; }
+
+
+/*************** MESSAGES ****************/
+div.prodigi-messages {
+    position:absolute; top:10%; left:10%; width:80%;
+    padding: 10px;
+    z-index: 9999;
+    max-height: 80%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    border:  1px solid #333;
+    -moz-box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+    -webkit-box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+}
+div.prodigi-messages div.prodigi-message {
+    font-size:24px;
+    padding:10px;
+    border-bottom: 1px solid #999;
+}
+div.prodigi-messages div.prodigi-message:last-child {
+    border-bottom:  none;
+}
+div.prodigi-message ul.validation-errors {
+    list-style: disc outside;
+    padding-left: 2em;
+}
+div.prodigi-message-more {
+    font-size: 60%;
+}
+
+div.prodigi-message-log {
+    color: gray;
+}
+div.prodigi-message-info {
+    color: black;
+}
+div.prodigi-message-warn {
+    color: orange;
+}
+div.prodigi-message-error {
+    color: red;
+}
+div.prodigi-message-close {
+    float: right;
+    width: 50px;
+    
+}
+/***************** AUDITOR *****************/
+#toolbar.auditor {
+    
+}
+#toolbar.auditor .accordion h3 {
+    font-size:120%;
+}
+.prodigi-x-audit-text {
+    float: left;
+    width:70%;
+    color: #999;
+}
+.prodigi-x-audit-radio {
+    float: left;
+    width:30%;
+    font-size: 120%;
+    font-weight: bold;
+}
+#toolbar.auditor .accordion h4 {
+    font-weight: bold;
+    font-size: 120%;
+}
+
+#toolbar.auditor .prodigi-x-audit-text dt,
+#toolbar.auditor .prodigi-x-audit-text dd {
+    color: black;
+    display: inline-block;
+    width: 49%;
+}
+#toolbar.auditor .prodigi-x-audit-text dd {
+    font-weight: bold;
+}
+
+/***************** TOOLBAR CONTROLS *****************/
+
+.edit {
+    display: inline-block;
+    top: 5px;
+    position: relative;
+    margin-left: 5px;
+}
+.edit li {
+    display: block;
+    float: left;
+    text-transform: uppercase;
+    font-size: 15px;
+    font-weight: bold;
+    -webkit-border-radius: 7px;
+    -moz-border-radius: 7px;
+    border-radius: 7px;
+    background-color: #585858;
+    margin-left: 5px;
+    -moz-box-shadow: inset 0 1px 3px #000;
+    -webkit-box-shadow: inset 0 1px 3px #000;
+    box-shadow: inset 0 1px 3px #000;
+}
+.edit li a { 
+    display: block; 
+    padding: 2px 8px; 
+    color: #fff; 
+    text-decoration: none; 
+}
+
+
+/************** PRODIGI X TRANSLATION STYLING ************/
+.translate-source .prodigi-x-container { width: auto; }
+.translate-source .prodigi-x-container #answer { margin-left: 0; }
+
+.translate-source .prodigi-x-container #answer,
+.translatetranslation .prodigi-x-container #answer,
+.translate-source .prodigi-x-container #question,
+.translatetranslation .prodigi-x-container #question { margin-left: 0; }
+
+/* translation source */
+body.prodigi-x-container.mode-playback.translate-source { width:698px; }
+
+.translate-source .prodigi-x-container.dragAndDrop #question { left: 0; }
+.translate-source .prodigi-x-container.dragAndDrop #labels { left: 0; float: left; margin: 18px 0 0; }
+
+.translate-source .prodigi-x-container #question { margin-top:18px; }
+.translate-source .prodigi-x-container #answer { width: auto; }
+
+
+/*************** PREVIEW MODE ****************/
+
+/* layout */
+.preview .prodigi-x-container .doc-wrapper {
+}
+/* tabs */
+.preview .prodigi-x-container .tabs {
+    display:none;
+}
+
+/* multiple choice */
+.preview .prodigi-x-container .prodigi-item-answer-radio {
+    display: none;
+}
+/* hints and solutions buttons */
+.preview .prodigi-x-container .hs-controls {  display: block; }
+
+.preview .prodigi-x-container ul li.tools { display:none; }

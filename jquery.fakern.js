@@ -59,7 +59,6 @@
             overrideKern : false
         }, opts);
         
-        
         var pairs,
 
         /*
@@ -128,13 +127,33 @@
          *  @returns {boolean|number} False if the letter should not be kerned | The negative kern value of that letter
          */
         _shouldKern = function(l, r) {
-            var ret = _inMultiArray(r, pairs[l]);
+            var ret = _inMultiArray(r, pairs[l]),
+                add;
 
             if ( !pairs[l] || _isExcluded(l, r) || ret === false || ret === undefined )  {
                 return false;
             }
 
-            return ret[1];
+            // compensating for browser (and os?) differences in text rendering
+            // ie 9
+            if ($.browser.msie && parseInt($.browser.version, 10) === 9) {
+                add = 62;
+
+            // all ie below 9 
+            } else if ($.browser.msie && parseInt($.browser.version, 10) < 9) {
+                add = 50;
+
+            // webkit
+            } else if ($.browser.webkit) {
+                add = 73;
+
+            // firefox always kerns, disregarding 'text-rendering' value
+            } else if ($.browser.mozilla) {
+                add = 60;
+            }
+            //add = 0;
+
+            return ret[1] + add;
         },
 
         /*

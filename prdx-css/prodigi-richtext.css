@@ -1,0 +1,148 @@
+/*
+ * This file is shared by "editable areas" in the 
+ * Author mode, and also by the actual "CKEditor" 
+ * (which is created as an iFrame, which is why this 
+ * is a separate file)
+*/
+.prodigi-richtext {
+    font-family: ArialModified, Arial, Verdana, sans-serif;
+    letter-spacing: 0.1px;
+    line-height: 1.2;
+    margin: 0;
+    overflow: hidden;
+    text-align: center;
+    word-spacing: 0.5px;
+    text-rendering: optimizeLegibility;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    border: 0 none;
+    list-style: none;
+    display: block;    
+    white-space: pre-wrap; /* needed for displaying old content correctly */
+    word-wrap: break-word;
+    overflow:hidden;
+    color: #000;
+}
+
+.prodigi-richtext span { /* effective default font size, requires everything to be in a span! */
+    font-size: 29px;
+    /*line-height:1.4;*/
+}
+
+.prodigi-richtext span span { /* child spans should not get the default size, but should inherit */
+    font-size: inherit;
+    line-height:inherit;
+}
+
+
+/* default size overrides (defining with chained classes for ckeditor markup) */
+.prodigi-item-label .prodigi-richtext span,
+.prodigi-item-label.prodigi-richtext span,
+.prodigi-item-hint .prodigi-richtext span,
+.prodigi-item-hint.prodigi-richtext span,
+.prodigi-item-solution .prodigi-richtext span,
+.prodigi-item-solution.prodigi-richtext span {
+    font-size: 22px
+}
+.prodigi-item-label .prodigi-richtext span span,
+.prodigi-item-label.prodigi-richtext span span,
+.prodigi-item-hint .prodigi-richtext span span,
+.prodigi-item-hint.prodigi-richtext span span,
+.prodigi-item-solution .prodigi-richtext span span
+.prodigi-item-solution.prodigi-richtext span span {
+    font-size: inherit;
+}
+
+.prodigi-richtext * { word-wrap:break-word; }
+
+body.prodigi-richtext  {
+    /* Remove the background color to make it transparent */
+    background-color: transparent;
+    
+    /* #6341: The text cursor must be set on the editor area. */
+    cursor: text;
+    line-height: normal;
+}
+.prodigi-richtext strong { font-weight: bold; }
+.prodigi-richtext em { font-style: italic; }
+
+.prodigi-richtext img, 
+.prodigi-richtext input, 
+.prodigi-richtext textarea {
+    cursor: default;
+}
+
+/* preserved spaces for rtl list item bullets. (#6249)*/
+.prodigi-richtext ol,
+.prodigi-richtext ul,
+.prodigi-richtext dl {
+    padding-right:40px;
+}
+
+.prodigi-richtext img:-moz-broken {
+    -moz-force-broken-image-icon: 1;
+    width: 24px;
+    height: 24px;
+}
+.prodigi-richtext img {
+    vertical-align: middle;
+}
+
+/* answer styling */
+.prodigi-item-answer .prodigi-richtext,
+.prodigi-item-answer.prodigi-richtext { color: #fff; }
+
+/* hints and solutions styling */
+.prodigi-item-solution .prodigi-richtext,
+.prodigi-item-solution.prodigi-richtext,
+.prodigi-item-hint .prodigi-richtext,
+.prodigi-item-hint.prodigi-richtext {
+    color: #fff;
+    font-size:22px;
+    letter-spacing: 0;
+}
+
+/* label styling */
+.prodigi-item-label .prodigi-richtext,
+.prodigi-item-label.prodigi-richtext,
+.prodigi-item-label .label-preview {
+    background-color: #1C9ED4;
+    line-height: 32px;
+    margin: 0 auto;
+    text-align: center;
+    cursor: move;
+    word-wrap:break-word;
+    font-size:22px;
+}
+.prodigi-item-label.author-view .prodigi-item-label-content,
+.prodigi-item-label.author-view.editing { cursor: text; }
+
+.prodigi-richtext sub,
+.prodigi-richtext > sub > strong,
+.prodigi-richtext > sub > strong > span,
+.prodigi-richtext > span > sub,
+.prodigi-richtext > strong > sub,
+.prodigi-richtext > strong > span > sub {
+    font-size: 50%;
+    /*vertical-align: text-bottom;*/
+}
+.prodigi-richtext sup {
+    font-size: 50%;
+    vertical-align: super;
+}
+
+/* compensating for iframe being 4px taller (why?) than actual content */
+.cke_editor iframe { margin-bottom: -4px; }
+
+
+math, mrow {
+    display: none;
+}
+
+/********** DEFAULT STYLING FOR CONTENT AREAS ************/
+.prodigi-item-question .noContent { font-weight: bold; }
+.prodigi-item-answer .noContent { font-weight: bold; color: #fff; }
+.prodigi-item-hint .noContent,
+.prodigi-item-solution .noContent { color: #fff; font-size: 22px; }
+.prodigi-item-label .noContent { font-size: 22px; font-weight: bold; }

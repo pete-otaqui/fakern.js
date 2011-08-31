@@ -1,0 +1,32 @@
+@font-face {
+    font-family: 'ArialModified';
+    src: url('../font/arial-modified.eot');
+    src: url('../font/arial-modified.eot?#iefix') format('embedded-opentype'),
+         url('../font/arial-modified.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'ArialModified';
+    src: url('../font/arial-modified-bd.eot');
+    src: url('../font/arial-modified-bd.eot?#iefix') format('embedded-opentype'),
+         url('../font/arial-modified-bd.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'ArialModified';
+    src: url('../font/arial-modified-bdit.eot');
+    src: url('../font/arial-modified-bdit.eot?#iefix') format('embedded-opentype'),
+         url('../font/arial-modified-bdit.ttf') format('truetype');
+    font-weight: bold;
+    font-style: italic;
+}
+@font-face {
+    font-family: 'ArialModified';
+    src: url('../font/arial-modified-it.eot');
+    src: url('../font/arial-modified-it.eot?#iefix') format('embedded-opentype'),
+         url('../font/arial-modified-it.ttf') format('truetype');
+    font-weight: normal;
+    font-style: italic;
+}

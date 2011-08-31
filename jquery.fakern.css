@@ -1,4 +1,6 @@
-body { font-family:arial; font-size:12px; }
-p { margin:0; }
+/*body { font-family:arial; font-size:29px; font-weight: bold; }
+p { margin:0; }*/
+body {font-weight: bold;text-align:left!important;}
 .fakern { color: #f00; }
 .inline { display:inline; }
+#test2 {position: relative; left: 2px; top: 5px}

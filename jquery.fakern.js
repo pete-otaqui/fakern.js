@@ -260,7 +260,9 @@
          */
         _traverseHTML = function(nodes) {
             for(var i=0; i<nodes.length; ++i) {
-                if(nodes[i].parentNode !== rootNode && nodes[i].parentNode.style.marginRight !== "") {
+                if(nodes[i].parentNode !== rootNode 
+                    && typeof nodes[i].parentNode.style != 'undefined'
+                    && nodes[i].parentNode.style.marginRight !== "") {
                     continue;
                 }
 
